@@ -200,22 +200,22 @@ export const processIdempotentAction = inngest.createFunction(
   async ({ event, step }) => {
     const { key } = event.data;
 
-    // STEP 2: Proceed with work if unique
-    await step.run("log-execution", async () => {
-      const { incrementJobCounter, saveJobResult } = await import("../lock");
+    // STEP 2: Simulate specialized business logic
+    await step.run("deep-compute-cycle", async () => {
+      const { saveJobResult } = await import("../lock");
       
-      await saveJobResult("idempotency", {
-        key,
-        executions: 0,
-        timestamp: new Date().toLocaleTimeString()
-      });
+      // Simulate heavy processing
+      await new Promise((res) => setTimeout(res, 2000));
 
-      await incrementJobCounter("idempotency", "executions");
+      await saveJobResult("idempotency", {
+        completed: true,
+        dataPointsAnalyzed: Math.floor(Math.random() * 15000) + 5000,
+        message: "Deep compute cycle finalized",
+        timestamp: new Date().toLocaleTimeString(),
+      });
     });
 
-    await step.sleep("simulate-work", "10s");
-
-    await step.run("unlock-api-ui", async () => {
+    await step.run("cleanup-and-unlock", async () => {
       const { unlock } = await import("../lock");
       await unlock("idempotency");
     });

@@ -42,6 +42,7 @@ export const saveJobResult = async (apiName: string, data: any) => {
   await collection.updateOne(
     { _id: apiName },
     { $set: { result: data, updatedAt: new Date() } },
+    { upsert: true }
   );
 };
 
@@ -57,7 +58,7 @@ export const incrementJobCounter = async (
       $inc: { [`result.${field}`]: amount },
       $set: { updatedAt: new Date() },
     },
-    { returnDocument: "after" },
+    { returnDocument: "after", upsert: true },
   );
   return result;
 };

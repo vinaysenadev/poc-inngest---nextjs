@@ -13,7 +13,8 @@ export async function POST() {
 
   await inngest.send(events);
 
-  const { incrementJobCounter } = await import("@/lib/lock");
+  const { checkAndLock, incrementJobCounter } = await import("@/lib/lock");
+  await checkAndLock("idempotency");
   await incrementJobCounter("idempotency", "totalRequests");
 
   return NextResponse.json({
